@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">app</string>
+
+    <!-- Image Content Descriptions -->
+    <string name="food_image">Food image</string>
+    <string name="food_image_description">Image representing the food recipe</string>
+    <string name="placeholder_image_description">Image placeholder while food image is loading</string>
+    <string name="error_image_description">Error while loading food image</string>
+
+    <!-- Detail Activity Strings -->
+    <string name="ingredients_label">Ingredients:</string>
+    <string name="recipe_label">Cooking Instructions:</string>
+    <string name="category_label">Recipe Category:</string>
+
+    <!-- Common UI Strings -->
+    <string name="add_button_description">Add a new recipe</string>
+    <string name="category">Recipe Category</string>
+    <string name="add_recipe">Add Recipe</string>
+
+    <!-- New Strings for Improved Usability -->
+    <string name="no_recipes_found">No recipes found for your search.</string>
+    <string name="search_hint">Search for recipes</string>
+    <string name="loading_recipes">Loading recipes...</string>
+    <string name="error_loading_recipes">Error loading recipes, please try again later.</string>
+</resources>

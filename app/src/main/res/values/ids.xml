@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="editTextRecipe" type="id" />
+    <item name="editTextIngredients" type="id" />
+    <item name="recipeTitle" type="id" />
+    <item name="ingredientsTitle" type="id" />
+</resources>
