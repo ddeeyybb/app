@@ -16,6 +16,7 @@
         app:tabTextColor="@android:color/darker_gray"
         app:tabMode="scrollable" />
 
+
     <!-- Content area below tabs -->
     <FrameLayout
         android:layout_width="match_parent"
@@ -46,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="50dp"
             android:contentDescription="@string/add_recipe"
             android:src="@drawable/img_1"
             app:backgroundTint="@color/white"

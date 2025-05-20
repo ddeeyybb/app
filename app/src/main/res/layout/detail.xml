@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -125,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:numStars="5"
-            android:stepSize="1"
+            android:stepSize="99"
             android:layout_marginTop="8dp"
             android:layout_gravity="start" />
 
@@ -136,8 +137,8 @@
             android:layout_height="wrap_content"
             android:hint="Write your comment here"
             android:inputType="textMultiLine"
-            android:minLines="2"
-            android:maxLines="4"
+            android:minLines="1"
+            android:maxLines="20"
             android:layout_marginTop="8dp"
             android:padding="8dp"
             android:background="@android:drawable/edit_text" />
@@ -163,12 +164,15 @@
             android:paddingTop="24dp"
             android:paddingBottom="8dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/reviewRecyclerView"
+        <!-- ListView for reviews -->
+        <ListView
+            android:id="@+id/reviewListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:layout_marginBottom="16dp" />
+            android:divider="#CCCCCC"
+            android:dividerHeight="1dp"
+            android:scrollbars="none"
+            android:nestedScrollingEnabled="true" />
 
     </LinearLayout>
 </ScrollView>

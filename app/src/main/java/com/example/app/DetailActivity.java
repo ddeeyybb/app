@@ -1,29 +1,21 @@
 package com.example.app;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.example.app.adapters.ReviewAdapter;
 import com.example.app.models.Review;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -32,7 +24,7 @@ public class DetailActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private EditText commentEditText;
     private Button submitReviewButton;
-    private RecyclerView reviewRecyclerView;
+    private ListView reviewListView;
 
     private String itemId;
     private int currentLikes = 0;
@@ -41,8 +33,8 @@ public class DetailActivity extends AppCompatActivity {
     private DatabaseReference foodRef;
     private FirebaseUser currentUser;
 
-    private ReviewAdapter reviewAdapter;
-    private List<Review> reviewList = new ArrayList<>();
+    private ReviewListAdapter reviewListAdapter;
+    private final List<Review> reviewList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +46,6 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Food Details");
         }
 
-        // Bind UI components
         foodImage = findViewById(R.id.foodImage);
         foodName = findViewById(R.id.foodName);
         categoryText = findViewById(R.id.categoryText);
@@ -65,47 +56,23 @@ public class DetailActivity extends AppCompatActivity {
         ratingBar = findViewById(R.id.ratingBar);
         commentEditText = findViewById(R.id.commentEditText);
         submitReviewButton = findViewById(R.id.submitReviewButton);
-        reviewRecyclerView = findViewById(R.id.reviewRecyclerView);
+        reviewListView = findViewById(R.id.reviewListView);
 
-        // Setup RecyclerView with GridLayoutManager
-        int spanCount = 2; // 2 columns
-        reviewRecyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
-        reviewAdapter = new ReviewAdapter(reviewList);
-        reviewRecyclerView.setAdapter(reviewAdapter);
+        reviewListAdapter = new ReviewListAdapter(reviewList);
+        reviewListView.setAdapter(reviewListAdapter);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        // Get intent extras
         itemId = getIntent().getStringExtra("itemId");
-        String name = getIntent().getStringExtra("itemName");
-        String imageUrl = getIntent().getStringExtra("itemImageUrl");
-        String category = getIntent().getStringExtra("itemCategory");
-        String recipe = getIntent().getStringExtra("itemRecipe");
-        List<String> ingredients = getIntent().getStringArrayListExtra("itemIngredients");
 
-        // Set UI content
-        foodName.setText(name != null ? name : "No Name");
-        categoryText.setText(category != null ? category : "Not Available");
-        recipeText.setText(recipe != null && !recipe.isEmpty() ? recipe : "Not Available");
-
-        if (ingredients != null && !ingredients.isEmpty()) {
-            ingredientsText.setText(String.join(", ", ingredients));
-        } else {
-            ingredientsText.setText("Not Available");
-        }
-
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            Glide.with(this)
-                    .load(imageUrl)
-                    .placeholder(R.drawable.placeholder_image)
-                    .error(R.drawable.error_image)
-                    .into(foodImage);
-        } else {
-            foodImage.setImageResource(R.drawable.placeholder_image);
+        if (itemId == null || itemId.isEmpty()) {
+            Toast.makeText(this, "Invalid item ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
         foodRef = FirebaseDatabase.getInstance().getReference("Foods").child(itemId);
 
+        loadFoodDetails();
         loadLikeCount();
         loadReviews();
 
@@ -136,50 +103,60 @@ public class DetailActivity extends AppCompatActivity {
                 return;
             }
 
-            String uid = currentUser.getUid();
-            long timestamp = System.currentTimeMillis();
-
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String username = snapshot.child("username").getValue(String.class);
-                    if (username == null || username.isEmpty()) {
-                        username = deriveFallbackUsername();
-                    }
-                    submitReview(new Review(rating, comment, username, timestamp, uid));
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    String username = deriveFallbackUsername();
-                    submitReview(new Review(rating, comment, username, timestamp, uid));
-                }
-            });
+            submitReviewButton.setEnabled(false);
+            submitReviewWithUsername(rating, comment);
         });
 
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    private String deriveFallbackUsername() {
-        if (currentUser.getDisplayName() != null && !currentUser.getDisplayName().isEmpty()) {
-            return currentUser.getDisplayName();
-        } else if (currentUser.getEmail() != null && !currentUser.getEmail().isEmpty()) {
-            return currentUser.getEmail().split("@")[0];
-        } else {
-            return "Anonymous";
-        }
-    }
+    private void loadFoodDetails() {
+        foodRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(DetailActivity.this, "Food item not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
 
-    private void submitReview(Review review) {
-        foodRef.child("reviews").push().setValue(review)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(DetailActivity.this, "Review submitted!", Toast.LENGTH_SHORT).show();
-                    ratingBar.setRating(0);
-                    commentEditText.setText("");
-                    loadReviews();
-                })
-                .addOnFailureListener(e -> Toast.makeText(DetailActivity.this, "Failed to submit review.", Toast.LENGTH_SHORT).show());
+                String name = snapshot.child("name").getValue(String.class);
+                String imageUrl = snapshot.child("imageUrl").getValue(String.class);
+                String category = snapshot.child("category").getValue(String.class);
+                String recipe = snapshot.child("recipe").getValue(String.class);
+
+                List<String> ingredients = new ArrayList<>();
+                for (DataSnapshot ingredientSnap : snapshot.child("ingredients").getChildren()) {
+                    String ingredient = ingredientSnap.getValue(String.class);
+                    if (ingredient != null) {
+                        ingredients.add(ingredient);
+                    }
+                }
+
+                foodName.setText(name != null ? name : "No Name");
+                categoryText.setText(category != null ? category : "Not Available");
+                recipeText.setText(recipe != null ? recipe : "Not Available");
+
+                ingredientsText.setText(!ingredients.isEmpty()
+                        ? String.join(", ", ingredients)
+                        : "Not Available");
+
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    Glide.with(DetailActivity.this)
+                            .load(imageUrl)
+                            .placeholder(R.drawable.placeholder_image)
+                            .error(R.drawable.error_image)
+                            .into(foodImage);
+                } else {
+                    foodImage.setImageResource(R.drawable.placeholder_image);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(DetailActivity.this, "Failed to load food details.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadLikeCount() {
@@ -218,9 +195,9 @@ public class DetailActivity extends AppCompatActivity {
                 likeCountText.setText(currentLikes + " likes");
                 likeButton.clearColorFilter();
                 isLikedByCurrentUser = false;
-            }).addOnFailureListener(e ->
-                    Toast.makeText(this, "Failed to remove like.", Toast.LENGTH_SHORT).show()
-            );
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "Failed to remove like.", Toast.LENGTH_SHORT).show();
+            });
         } else {
             foodRef.child("likedUsers").child(uid).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && !task.getResult().exists()) {
@@ -238,7 +215,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadReviews() {
-        foodRef.child("reviews").orderByChild("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
+        foodRef.child("reviews").orderByChild("timestamp").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 reviewList.clear();
@@ -248,8 +225,12 @@ public class DetailActivity extends AppCompatActivity {
                         reviewList.add(review);
                     }
                 }
-                Collections.reverse(reviewList); // Show latest first
-                reviewAdapter.notifyDataSetChanged();
+                Collections.reverse(reviewList); // Show newest first
+                reviewListAdapter.notifyDataSetChanged();
+
+                if (!reviewList.isEmpty()) {
+                    reviewListView.smoothScrollToPosition(0);
+                }
             }
 
             @Override
@@ -259,18 +240,133 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
+    private void submitReviewWithUsername(int rating, String comment) {
+        String uid = currentUser.getUid();
+        long timestamp = System.currentTimeMillis();
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String username = snapshot.child("username").getValue(String.class);
+                if (username == null || username.trim().isEmpty()) {
+                    username = getFallbackUsername();
+                }
+                submitReview(new Review(rating, comment, username, timestamp, uid));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                String username = getFallbackUsername();
+                submitReview(new Review(rating, comment, username, timestamp, uid));
+            }
+        });
+    }
+
+    private String getFallbackUsername() {
+        if (currentUser.getDisplayName() != null && !currentUser.getDisplayName().isEmpty()) {
+            return currentUser.getDisplayName();
+        } else if (currentUser.getEmail() != null) {
+            return currentUser.getEmail().split("@")[0];
+        } else {
+            return "Anonymous";
+        }
+    }
+
+    private void submitReview(Review review) {
+        foodRef.child("reviews").push().setValue(review)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(DetailActivity.this, "Review submitted!", Toast.LENGTH_SHORT).show();
+                    ratingBar.setRating(0);
+                    commentEditText.setText("");
+                    submitReviewButton.setEnabled(true);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(DetailActivity.this, "Failed to submit review.", Toast.LENGTH_SHORT).show();
+                    submitReviewButton.setEnabled(true);
+                });
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    // ReviewListAdapter for ListView
+    private class ReviewListAdapter extends BaseAdapter {
+
+        private final List<Review> reviews;
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+
+        ReviewListAdapter(List<Review> reviews) {
+            this.reviews = reviews;
+        }
+
+        @Override
+        public int getCount() {
+            return reviews.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return reviews.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(DetailActivity.this).inflate(R.layout.item_review, parent, false);
+                holder = new ViewHolder();
+                holder.usernameTextView = convertView.findViewById(R.id.reviewUsername);
+                holder.ratingBar = convertView.findViewById(R.id.reviewRatingBar);
+                holder.commentTextView = convertView.findViewById(R.id.reviewCommentText);
+                holder.uidTextView = convertView.findViewById(R.id.reviewUid);
+                holder.dateTextView = convertView.findViewById(R.id.reviewDate);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            Review review = reviews.get(position);
+
+            holder.usernameTextView.setText(review.getUsername() != null ? review.getUsername() : "Anonymous");
+            holder.ratingBar.setRating(review.getRating() != null ? review.getRating() : 0);
+            holder.commentTextView.setText(review.getComment() != null ? review.getComment() : "");
+
+            if (review.getUid() != null && !review.getUid().isEmpty()) {
+                holder.uidTextView.setVisibility(View.VISIBLE);
+                holder.uidTextView.setText("User ID: " + review.getUid());
+            } else {
+                holder.uidTextView.setVisibility(View.GONE);
+            }
+
+            if (review.getTimestamp() != null) {
+                holder.dateTextView.setText(dateFormat.format(new Date(review.getTimestamp())));
+            } else {
+                holder.dateTextView.setText("");
+            }
+
+            return convertView;
+        }
+
+        class ViewHolder {
+            TextView usernameTextView;
+            RatingBar ratingBar;
+            TextView commentTextView;
+            TextView uidTextView;
+            TextView dateTextView;
+        }
     }
 }
