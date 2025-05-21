@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,7 +27,7 @@ import java.util.List;
 public class Search extends Fragment {
 
     private EditText searchBar;
-    private GridView gridViewFoods;
+    private ListView listViewFoods;
     private ItemAdapter itemAdapter;
     private List<ItemActivity> foodList;
     private List<ItemActivity> filteredFoodList;
@@ -44,7 +44,7 @@ public class Search extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         searchBar = view.findViewById(R.id.searchBar);
-        gridViewFoods = view.findViewById(R.id.gridViewFoods);
+        listViewFoods = view.findViewById(R.id.listViewFoods);
 
         foodList = new ArrayList<>();
         filteredFoodList = new ArrayList<>();
@@ -52,7 +52,7 @@ public class Search extends Fragment {
         databaseReference = FirebaseDatabase.getInstance().getReference("Foods");
 
         itemAdapter = new ItemAdapter(requireContext(), filteredFoodList, this::openDetailActivity);
-        gridViewFoods.setAdapter(itemAdapter);
+        listViewFoods.setAdapter(itemAdapter);
 
         loadFoodItems();
         setupSearch();

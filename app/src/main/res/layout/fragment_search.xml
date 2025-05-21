@@ -21,15 +21,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 🍱 Food GridView -->
-    <GridView
-        android:id="@+id/gridViewFoods"
+    <!-- 🍱 Food ListView -->
+    <ListView
+        android:id="@+id/listViewFoods"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:numColumns="2"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
-        android:gravity="center"
+        android:dividerHeight="8dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/searchBar"
         app:layout_constraintStart_toStartOf="parent"

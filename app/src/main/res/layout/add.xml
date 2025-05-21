@@ -45,14 +45,24 @@
             android:gravity="top"
             android:layout_marginBottom="16dp" />
 
-        <EditText
-            android:id="@+id/editTextImageUrl"
+        <!-- New: Image preview -->
+        <ImageView
+            android:id="@+id/imageViewPreview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp"
+            android:scaleType="centerCrop"
+            android:background="#DDDDDD" />
+
+        <!-- New: Button to pick image -->
+        <Button
+            android:id="@+id/buttonPickImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Image URL"
-            android:minHeight="48dp" />
+            android:text="Choose Image"
+            android:layout_marginBottom="16dp" />
 
+        <!-- Save Button -->
         <Button
             android:id="@+id/buttonSubmit"
             android:layout_width="match_parent"
@@ -60,6 +70,7 @@
             android:text="Save Recipe"
             android:layout_marginBottom="16dp" />
 
+        <!-- Loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

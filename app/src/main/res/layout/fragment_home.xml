@@ -16,23 +16,19 @@
         app:tabTextColor="@android:color/darker_gray"
         app:tabMode="scrollable" />
 
-
     <!-- Content area below tabs -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <GridView
-            android:id="@+id/gridViewFoods"
+        <ListView
+            android:id="@+id/listViewFoods"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="2"
-            android:verticalSpacing="8dp"
-            android:horizontalSpacing="8dp"
+            android:dividerHeight="8dp"
             android:padding="8dp"
-            android:clipToPadding="false"
-            android:stretchMode="columnWidth" />
+            android:clipToPadding="false" />
 
         <ProgressBar
             android:id="@+id/progressBar"

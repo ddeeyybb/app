@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -23,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Home extends Fragment {
@@ -30,7 +32,7 @@ public class Home extends Fragment {
     private static final int ADD_RECIPE_REQUEST = 1001;
 
     private TabLayout categoryTabs;
-    private GridView gridViewFoods;
+    private ListView listViewFoods;
     private ProgressBar progressBar;
     private FloatingActionButton fabAdd;
 
@@ -46,7 +48,7 @@ public class Home extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         categoryTabs = view.findViewById(R.id.categoryTabs);
-        gridViewFoods = view.findViewById(R.id.gridViewFoods);
+        listViewFoods = view.findViewById(R.id.listViewFoods);
         progressBar = view.findViewById(R.id.progressBar);
         fabAdd = view.findViewById(R.id.fab_add);
 
@@ -57,38 +59,32 @@ public class Home extends Fragment {
         categoryTabs.addTab(categoryTabs.newTab().setText("Drinks"));
 
         itemAdapter = new ItemAdapter(requireContext(), foodList, this::openDetailActivity);
-        gridViewFoods.setAdapter(itemAdapter);
+        listViewFoods.setAdapter(itemAdapter);
 
         databaseReference = FirebaseDatabase.getInstance().getReference("Foods");
 
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), Add.class);
-                startActivityForResult(intent, ADD_RECIPE_REQUEST);
-            }
+        fabAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), Add.class);
+            startActivityForResult(intent, ADD_RECIPE_REQUEST);
         });
 
         // Load all foods initially
         loadAllFoods();
 
-        // Listen for tab selection to filter data
         categoryTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 String selectedCategory = tab.getText().toString();
-                if (selectedCategory.equals("All")) {
+                if ("All".equals(selectedCategory)) {
                     loadAllFoods();
                 } else {
                     loadFoodsByCategory(selectedCategory);
                 }
             }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
         return view;
@@ -122,6 +118,16 @@ public class Home extends Fragment {
                         foodList.add(foodItem);
                     }
                 }
+
+                // Sort by newest upload first (descending uploadTime)
+                Collections.sort(foodList, (a, b) -> Long.compare(b.getUploadTime(), a.getUploadTime()));
+
+                // If you want to sort by popularity (likes + rating), uncomment this:
+                /*
+                Collections.sort(foodList, (a, b) ->
+                    Float.compare(b.getPopularityScore(), a.getPopularityScore()));
+                */
+
                 itemAdapter.updateFoodList(foodList);
                 progressBar.setVisibility(View.GONE);
             }
@@ -158,6 +164,16 @@ public class Home extends Fragment {
                                 foodList.add(foodItem);
                             }
                         }
+
+                        // Sort by newest upload first (descending uploadTime)
+                        Collections.sort(foodList, (a, b) -> Long.compare(b.getUploadTime(), a.getUploadTime()));
+
+                        // Or sort by popularity:
+                        /*
+                        Collections.sort(foodList, (a, b) ->
+                            Float.compare(b.getPopularityScore(), a.getPopularityScore()));
+                        */
+
                         itemAdapter.updateFoodList(foodList);
                         progressBar.setVisibility(View.GONE);
                     }

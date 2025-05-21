@@ -38,28 +38,29 @@ android {
 }
 
 dependencies {
-    // Core Android
+    // Core Android libraries
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
 
-    // Firebase
+    // Firebase - using Firebase BOM for version alignment
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
 
-    // Networking (for ImgBB)
+    // Networking libraries (Volley, OkHttp, Retrofit for flexibility)
     implementation(libs.okhttp)
+    implementation(libs.volley)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
-    // Image Loading
+    // Image loading with Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
-    // Testing
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
