@@ -4,17 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bottom_nav_bg">
 
     <!-- Category Tabs at the top -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/categoryTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/bottom_nav_bg"
+        android:elevation="4dp"
         app:tabIndicatorColor="@color/black"
         app:tabSelectedTextColor="@color/black"
         app:tabTextColor="@android:color/darker_gray"
-        app:tabMode="scrollable" />
+        app:tabMode="scrollable"
+        app:tabIndicatorHeight="3dp"
+        app:tabRippleColor="@android:color/transparent" />
 
     <!-- Content area below tabs -->
     <FrameLayout
@@ -22,31 +27,38 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- List of Foods -->
         <ListView
             android:id="@+id/listViewFoods"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:dividerHeight="8dp"
-            android:padding="8dp"
-            android:clipToPadding="false" />
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:padding="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:background="#FDFBFB" />
 
+        <!-- Centered ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center"
             android:visibility="gone" />
 
+        <!-- Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="28dp"
             android:contentDescription="@string/add_recipe"
             android:src="@drawable/img_1"
-            app:backgroundTint="@color/white"
-            app:tint="@android:color/black" />
+            app:backgroundTint="@color/bottom_nav_bg"
+            app:tint="@android:color/black"
+            app:elevation="6dp" />
     </FrameLayout>
 </LinearLayout>

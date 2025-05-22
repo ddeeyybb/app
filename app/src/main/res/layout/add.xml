@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp">
@@ -10,73 +11,111 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <EditText
-            android:id="@+id/editTextFoodName"
+        <!-- CardView containing form inputs -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Recipe name"
-            android:minHeight="48dp" />
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="4dp"
+            card_view:cardBackgroundColor="#FFFFFF">
 
-        <Spinner
-            android:id="@+id/spinnerCategory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:minHeight="48dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <EditText
-            android:id="@+id/editTextIngredients"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ingredients (separate with commas)"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginBottom="16dp" />
+                <EditText
+                    android:id="@+id/editTextFoodName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Recipe name"
+                    android:minHeight="48dp"
+                    android:padding="12dp"
+                    android:textColor="#0F0E0E"
+                    android:textColorHint="#7A7272"
+                    android:textSize="15sp"
+                    android:background="@drawable/edit_text_background" />
 
-        <EditText
-            android:id="@+id/editTextRecipe"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Recipe instructions"
-            android:inputType="textMultiLine"
-            android:minLines="5"
-            android:gravity="top"
-            android:layout_marginBottom="16dp" />
+                <Spinner
+                    android:id="@+id/spinnerCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:minHeight="48dp"
+                    android:padding="12dp"
+                    android:background="@drawable/spinner_background"
+                    android:backgroundTint="#F8121010"
+                    android:textColorHint="#040303" />
 
-        <!-- New: Image preview -->
-        <ImageView
-            android:id="@+id/imageViewPreview"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="16dp"
-            android:scaleType="centerCrop"
-            android:background="#DDDDDD" />
+                <EditText
+                    android:id="@+id/editTextIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Ingredients (separate with commas)"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:gravity="top"
+                    android:padding="12dp"
+                    android:textColor="#0F0E0E"
+                    android:textColorHint="#7A7272"
+                    android:textSize="15sp"
+                    android:background="@drawable/edit_text_background" />
 
-        <!-- New: Button to pick image -->
+                <EditText
+                    android:id="@+id/editTextRecipe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Recipe instructions"
+                    android:inputType="textMultiLine"
+                    android:minLines="5"
+                    android:gravity="top"
+                    android:padding="12dp"
+                    android:textColor="#0F0E0E"
+                    android:textColorHint="#7A7272"
+                    android:textSize="15sp"
+                    android:background="@drawable/edit_text_background" />
+
+                <ImageView
+                    android:id="@+id/imageViewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginBottom="8dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/image_preview_background" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Buttons and ProgressBar -->
         <Button
             android:id="@+id/buttonPickImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#957F56"
             android:text="Choose Image"
-            android:layout_marginBottom="16dp" />
+            android:textColor="#FFFFFF" />
 
-        <!-- Save Button -->
         <Button
             android:id="@+id/buttonSubmit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#957F56"
             android:text="Save Recipe"
-            android:layout_marginBottom="16dp" />
+            android:textColor="#FFFFFF" />
 
-        <!-- Loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
     </LinearLayout>
 </ScrollView>
